@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Web One-Page Report | Generasi AI & Eksport</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    
+    <!-- Quill Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    
+    <!-- FilePond CSS -->
+    <link href="https://unpkg.com/filepond@4.30.4/dist/filepond.css" rel="stylesheet">
+    <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --futuristic-bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+        }
+        
+        body {
+            background: var(--futuristic-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .gradient-header {
+            background: var(--primary-gradient);
+            height: 300px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: -1;
+            border-radius: 0 0 40% 40%;
+            transform: scale(1.2);
+        }
+        
+        .futuristic-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .futuristic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card-header-futuristic {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 25px;
+            border-radius: 20px 20px 0 0 !important;
+        }
+        
+        .btn-futuristic {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-futuristic:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-futuristic {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary-futuristic:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+            color: white;
+        }
+        
+        .form-control-futuristic {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: white;
+            padding: 14px 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control-futuristic:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #667eea;
+            color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+        
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .image-preview {
+            width: 120px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-preview:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+        }
+        
+        .logo-preview {
+            max-width: 200px;
+            max-height: 100px;
+            object-fit: contain;
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .ai-section {
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .report-preview {
+            background: white;
+            color: #333;
+            border-radius: 15px;
+            padding: 30px;
+            min-height: 800px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-header {
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .report-logo {
+            max-height: 80px;
+            max-width: 200px;
+        }
+        
+        .report-image-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .report-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #667eea;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .gradient-header {
+                height: 200px;
+            }
+            
+            .report-image-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Gradient Header -->
+    <div class="gradient-header"></div>
+    
+    <!-- Main Container -->
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="row mb-5">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-3">One-Page Report AI</h1>
+                <p class="lead">Sistem penjanaan laporan satu halaman dengan AI dan eksport ke Word/PDF</p>
+                <div class="floating-element">
+                    <i class="bi bi-robot fs-1 text-warning"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Form & Preview -->
+        <div class="row">
+            <!-- Left Column: Input Form -->
+            <div class="col-lg-6">
+                <!-- Program Details Card -->
+                <div class="futuristic-card fade-in">
+                    <div class="card-header-futuristic">
+                        <h3 class="h5 mb-0"><i class="bi bi-info-circle me-2"></i>Maklumat Program</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label for="programTitle" class="form-label">Tajuk Program *</label>
+                            <input type="text" class="form-control form-control-futuristic" id="programTitle" placeholder="Masukkan tajuk program">
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="programDate" class="form-label">Tarikh Program</label>
+                                <input type="date" class="form-control form-control-futuristic" id="programDate">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="programLocation" class="form-label">Lokasi</label>
+                                <input type="text" class="form-control form-control-futuristic" id="programLocation" placeholder="Lokasi program">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="supervisorName" class="form-label">Nama Penyelia</label>
+                            <input type="text" class="form-control form-control-futuristic" id="supervisorName" placeholder="Nama penyelia program">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="programSummary" class="form-label">Ringkasan & Nota Tambahan</label>
+                            <textarea class="form-control form-control-futuristic" id="programSummary" rows="4" placeholder="Ringkasan program, nota, atau maklumat tambahan..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Logo & Image Upload Card -->
+                <div class="futuristic-card fade-in">
+                    <div class="card-header-futuristic">
+                        <h3 class="h5 mb-0"><i class="bi bi-cloud-upload me-2"></i>Muat Naik Logo & Gambar</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label class="form-label">Logo Sekolah (Pilihan)</label>
+                            <div id="logoUploadArea" class="border-dashed p-4 text-center rounded-3 mb-3" style="border: 2px dashed rgba(255,255,255,0.3); cursor: pointer;">
+                                <i class="bi bi-cloud-arrow-up fs-1 mb-2"></i>
+                                <p>Klik atau seret untuk muat naik logo</p>
+                                <p class="small text-muted">Format: PNG/JPG (Maks: 5MB)</p>
+                            </div>
+                            <input type="file" id="logoUpload" accept=".png,.jpg,.jpeg" class="d-none">
+                            <div id="logoPreviewContainer" class="mt-3 text-center">
+                                <!-- Logo preview akan muncul di sini -->
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Gambar Program (1-6 gambar)</label>
+                            <div id="imageUploadArea" class="border-dashed p-4 text-center rounded-3 mb-3" style="border: 2px dashed rgba(255,255,255,0.3); cursor: pointer;">
+                                <i class="bi bi-images fs-1 mb-2"></i>
+                                <p>Klik atau seret untuk muat naik gambar</p>
+                                <p class="small text-muted">Format: JPG/PNG (Maks: 5MB setiap satu)</p>
+                            </div>
+                            <input type="file" id="imageUpload" accept=".png,.jpg,.jpeg" multiple class="d-none">
+                            <div id="imagePreviewContainer" class="image-preview-container">
+                                <!-- Gambar preview akan muncul di sini -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Generation Card -->
+                <div class="futuristic-card fade-in">
+                    <div class="card-header-futuristic">
+                        <h3 class="h5 mb-0"><i class="bi bi-magic me-2"></i>Penjanaan Kandungan AI</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="alert alert-info bg-primary bg-opacity-10 border border-primary border-opacity-25">
+                            <i class="bi bi-info-circle me-2"></i>AI akan menjana kandungan berdasarkan tajuk program, nota, dan gambar (jika ada).
+                        </div>
+                        
+                        <div class="text-center my-4">
+                            <button id="generateAI" class="btn-futuristic">
+                                <i class="bi bi-robot me-2"></i>Jana Kandungan AI
+                            </button>
+                        </div>
+                        
+                        <!-- Loading Spinner -->
+                        <div id="loadingSpinner" class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>AI sedang menjana kandungan... Sila tunggu.</p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <p class="small text-muted">AI akan menjana 5 seksyen:</p>
+                            <ul class="small text-muted">
+                                <li>Objektif Program</li>
+                                <li>Rumusan Program</li>
+                                <li>Kekuatan Program</li>
+                                <li>Kelemahan Program</li>
+                                <li>Cadangan Penambahbaikan</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Preview & Export -->
+            <div class="col-lg-6">
+                <!-- Report Preview Card -->
+                <div class="futuristic-card fade-in">
+                    <div class="card-header-futuristic d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0"><i class="bi bi-eye me-2"></i>Pratonton Laporan</h3>
+                        <div>
+                            <button id="downloadWord" class="btn-secondary-futuristic btn-sm me-2">
+                                <i class="bi bi-file-earmark-word me-1"></i>Word
+                            </button>
+                            <button id="downloadPDF" class="btn-secondary-futuristic btn-sm">
+                                <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-3">
+                        <div id="reportPreview" class="report-preview">
+                            <!-- Report preview akan dijana di sini -->
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-file-text display-4 mb-3"></i>
+                                <h4>Laporan akan dipaparkan di sini</h4>
+                                <p>Isi borang di sebelah kiri dan klik "Jana Kandungan AI" untuk memulakan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Generated Content Editor -->
+                <div class="futuristic-card fade-in">
+                    <div class="card-header-futuristic">
+                        <h3 class="h5 mb-0"><i class="bi bi-pencil-square me-2"></i>Editor Kandungan AI</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="aiSectionsContainer">
+                            <!-- AI sections akan ditambah di sini -->
+                            <div class="text-center py-4 text-muted">
+                                <i class="bi bi-robot display-6 mb-3"></i>
+                                <p>Klik "Jana Kandungan AI" untuk menghasilkan kandungan yang boleh diedit</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <p class="text-muted">Sistem One-Page Report dengan Generasi AI & Eksport | Dibangunkan dengan Bootstrap 5</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Quill Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    
+    <!-- FilePond JS -->
+    <script src="https://unpkg.com/filepond@4.30.4/dist/filepond.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+    
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Docx.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.7.0/index.min.js"></script>
+    
+    <script>
+        // Inisialisasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables
+            let uploadedLogo = null;
+            let uploadedImages = [];
+            let aiGeneratedContent = {};
+            let editors = {};
+            
+            // DOM Elements
+            const programTitle = document.getElementById('programTitle');
+            const programDate = document.getElementById('programDate');
+            const programLocation = document.getElementById('programLocation');
+            const supervisorName = document.getElementById('supervisorName');
+            const programSummary = document.getElementById('programSummary');
+            const logoUpload = document.getElementById('logoUpload');
+            const logoUploadArea = document.getElementById('logoUploadArea');
+            const logoPreviewContainer = document.getElementById('logoPreviewContainer');
+            const imageUpload = document.getElementById('imageUpload');
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+            const generateAIButton = document.getElementById('generateAI');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const reportPreview = document.getElementById('reportPreview');
+            const aiSectionsContainer = document.getElementById('aiSectionsContainer');
+            const downloadWordButton = document.getElementById('downloadWord');
+            const downloadPDFButton = document.getElementById('downloadPDF');
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            programDate.value = today;
+            
+            // Logo upload handling
+            logoUploadArea.addEventListener('click', () => logoUpload.click());
+            logoUpload.addEventListener('change', handleLogoUpload);
+            
+            // Image upload handling
+            imageUploadArea.addEventListener('click', () => imageUpload.click());
+            imageUpload.addEventListener('change', handleImageUpload);
+            
+            // AI generation
+            generateAIButton.addEventListener('click', generateAIContent);
+            
+            // Export buttons
+            downloadWordButton.addEventListener('click', exportToWord);
+            downloadPDFButton.addEventListener('click', exportToPDF);
+            
+            // Event listeners for form changes
+            [programTitle, programDate, programLocation, supervisorName, programSummary].forEach(element => {
+                element.addEventListener('input', updatePreview);
+            });
+            
+            // Functions
+            function handleLogoUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                // Validate file type
+                if (!file.type.match('image/png') && !file.type.match('image/jpeg')) {
+                    alert('Hanya format PNG dan JPG dibenarkan untuk logo.');
+                    return;
+                }
+                
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Fail logo terlalu besar. Maksimum saiz: 5MB');
+                    return;
+                }
+                
+                // Create preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedLogo = e.target.result;
+                    
+                    // Display preview
+                    logoPreviewContainer.innerHTML = `
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="mb-1">Logo dimuat naik:</p>
+                                <img src="${uploadedLogo}" class="logo-preview" alt="Logo sekolah">
+                            </div>
+                            <button class="btn btn-sm btn-secondary-futuristic" onclick="removeLogo()">
+                                <i class="bi bi-x"></i> Buang
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Update preview
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function removeLogo() {
+                uploadedLogo = null;
+                logoPreviewContainer.innerHTML = '';
+                logoUpload.value = '';
+                updatePreview();
+            }
+            
+            function handleImageUpload(event) {
+                const files = Array.from(event.target.files);
+                
+                // Validate number of images
+                if (uploadedImages.length + files.length > 6) {
+                    alert('Maksimum 6 gambar dibenarkan.');
+                    return;
+                }
+                
+                files.forEach(file => {
+                    // Validate file type
+                    if (!file.type.match('image/png') && !file.type.match('image/jpeg')) {
+                        alert(`Fail ${file.name} bukan format PNG/JPG.`);
+                        return;
+                    }
+                    
+                    // Validate file size (5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert(`Fail ${file.name} terlalu besar. Maksimum saiz: 5MB`);
+                        return;
+                    }
+                    
+                    // Create preview
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedImages.push({
+                            id: Date.now() + Math.random(),
+                            src: e.target.result,
+                            name: file.name
+                        });
+                        
+                        // Update preview
+                        updateImagePreviews();
+                        updatePreview();
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            function updateImagePreviews() {
+                imagePreviewContainer.innerHTML = '';
+                
+                uploadedImages.forEach((image, index) => {
+                    const imgElement = document.createElement('div');
+                    imgElement.className = 'position-relative';
+                    imgElement.innerHTML = `
+                        <img src="${image.src}" class="image-preview" alt="Gambar program">
+                        <button class="btn btn-sm btn-danger position-absolute top-0 end-0 p-0 rounded-circle" 
+                                style="width: 24px; height: 24px; transform: translate(30%, -30%);"
+                                onclick="removeImage(${index})">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    `;
+                    imagePreviewContainer.appendChild(imgElement);
+                });
+                
+                // Add upload prompt if less than 6 images
+                if (uploadedImages.length < 6) {
+                    const promptElement = document.createElement('div');
+                    promptElement.className = 'd-flex flex-column align-items-center justify-content-center';
+                    promptElement.style.width = '120px';
+                    promptElement.style.height = '90px';
+                    promptElement.style.border = '2px dashed rgba(255,255,255,0.3)';
+                    promptElement.style.borderRadius = '10px';
+                    promptElement.style.cursor = 'pointer';
+                    promptElement.innerHTML = `
+                        <i class="bi bi-plus-lg"></i>
+                        <small>Tambah</small>
+                    `;
+                    promptElement.addEventListener('click', () => imageUpload.click());
+                    imagePreviewContainer.appendChild(promptElement);
+                }
+            }
+            
+            function removeImage(index) {
+                uploadedImages.splice(index, 1);
+                updateImagePreviews();
+                updatePreview();
+            }
+            
+            function generateAIContent() {
+                // Show loading spinner
+                loadingSpinner.style.display = 'block';
+                generateAIButton.disabled = true;
+                
+                // Simulate AI generation (in real app, this would call an API)
+                setTimeout(() => {
+                    const title = programTitle.value || 'Program Tanpa Tajuk';
+                    
+                    // Generate AI content based on input
+                    aiGeneratedContent = {
+                        objektif: generateObjectives(title, programSummary.value),
+                        rumusan: generateSummary(title, programSummary.value),
+                        kekuatan: generateStrengths(title),
+                        kelemahan: generateWeaknesses(title),
+                        cadangan: generateRecommendations(title)
+                    };
+                    
+                    // Display AI content in editors
+                    displayAIEditors();
+                    
+                    // Update preview
+                    updatePreview();
+                    
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    generateAIButton.disabled = false;
+                    
+                    // Scroll to editors
+                    aiSectionsContainer.scrollIntoView({ behavior: 'smooth' });
+                }, 2000); // Simulate 2-second delay
+            }
+            
+            function generateObjectives(title, summary) {
+                return `<ul>
+                    <li>Memberi pendedahan praktikal tentang ${title} kepada peserta</li>
+                    <li>Meningkatkan kemahiran peserta dalam bidang berkaitan</li>
+                    <li>Mewujudkan jaringan profesional antara peserta</li>
+                    <li>Memberi peluang kepada peserta untuk mengaplikasikan pengetahuan teori</li>
+                    ${summary ? `<li>${summary.substring(0, 100)}...</li>` : ''}
+                </ul>`;
+            }
+            
+            function generateSummary(title, summary) {
+                return `<p>Program ${title} telah berjaya dilaksanakan dengan jayanya. Program ini melibatkan penyertaan aktif daripada semua peserta yang hadir. ${summary || 'Program ini memberikan impak yang positif kepada semua yang terlibat.'}</p>
+                <p>Melalui program ini, peserta telah memperoleh pengetahuan dan pengalaman baru yang berguna untuk perkembangan diri dan kerjaya mereka.</p>`;
+            }
+            
+            function generateStrengths(title) {
+                return `<ul>
+                    <li>Penglibatan aktif daripada peserta</li>
+                    <li>Pengisian program yang menarik dan relevan</li>
+                    <li>Fasilitator yang berpengalaman dan berpengetahuan</li>
+                    <li>Persekitaran yang kondusif untuk pembelajaran</li>
+                    <li>Sokongan organisasi yang baik</li>
+                </ul>`;
+            }
+            
+            function generateWeaknesses(title) {
+                return `<ul>
+                    <li>Masa program yang agak terhad</li>
+                    <li>Beberapa sesi memerlukan peralatan tambahan</li>
+                    <li>Penglibatan peserta luar yang boleh ditingkatkan</li>
+                    <li>Tempoh rehat yang perlu dioptimumkan</li>
+                </ul>`;
+            }
+            
+            function generateRecommendations(title) {
+                return `<ul>
+                    <li>Memperuntukkan lebih banyak masa untuk sesi praktikal</li>
+                    <li>Menyediakan peralatan yang mencukupi untuk sesi hadapan</li>
+                    <li>Menambah baik sistem pendaftaran peserta</li>
+                    <li>Mengadakan program susulan untuk kesinambungan</li>
+                    <li>Meningkatkan promosi untuk menarik lebih ramai peserta</li>
+                </ul>`;
+            }
+            
+            function displayAIEditors() {
+                aiSectionsContainer.innerHTML = '';
+                
+                const sections = [
+                    { id: 'objektif', title: 'Objektif Program', content: aiGeneratedContent.objektif },
+                    { id: 'rumusan', title: 'Rumusan Program', content: aiGeneratedContent.rumusan },
+                    { id: 'kekuatan', title: 'Kekuatan Program', content: aiGeneratedContent.kekuatan },
+                    { id: 'kelemahan', title: 'Kelemahan Program', content: aiGeneratedContent.kelemahan },
+                    { id: 'cadangan', title: 'Cadangan Penambahbaikan', content: aiGeneratedContent.cadangan }
+                ];
+                
+                sections.forEach(section => {
+                    const sectionElement = document.createElement('div');
+                    sectionElement.className = 'ai-section mb-4';
+                    sectionElement.innerHTML = `
+                        <h5 class="fw-bold">${section.title}</h5>
+                        <div id="editor-${section.id}" class="ai-editor bg-white rounded border" style="height: 150px;"></div>
+                    `;
+                    
+                    aiSectionsContainer.appendChild(sectionElement);
+                    
+                    // Initialize Quill editor
+                    const editor = new Quill(`#editor-${section.id}`, {
+                        theme: 'snow',
+                        modules: {
+                            toolbar: [
+                                ['bold', 'italic', 'underline'],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                ['clean']
+                            ]
+                        }
+                    });
+                    
+                    editor.root.innerHTML = section.content;
+                    
+                    // Store editor reference
+                    editors[section.id] = editor;
+                    
+                    // Update preview when editor changes
+                    editor.on('text-change', function() {
+                        aiGeneratedContent[section.id] = editor.root.innerHTML;
+                        updatePreview();
+                    });
+                });
+            }
+            
+            function updatePreview() {
+                // Get form values
+                const title = programTitle.value || 'Program Tanpa Tajuk';
+                const date = programDate.value ? new Date(programDate.value).toLocaleDateString('ms-MY') : 'Tarikh tidak ditetapkan';
+                const location = programLocation.value || 'Lokasi tidak dinyatakan';
+                const supervisor = supervisorName.value || 'Nama tidak dinyatakan';
+                const summary = programSummary.value || '';
+                
+                // Build report preview HTML
+                let previewHTML = `
+                    <div class="report-header">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                ${uploadedLogo ? `<img src="${uploadedLogo}" class="report-logo mb-3" alt="Logo sekolah">` : ''}
+                                <h1 class="display-6 fw-bold">${title}</h1>
+                            </div>
+                            <div class="text-end">
+                                <p class="mb-1"><strong>Tarikh:</strong> ${date}</p>
+                                <p class="mb-1"><strong>Lokasi:</strong> ${location}</p>
+                                <p class="mb-0"><strong>Penyelia:</strong> ${supervisor}</p>
+                            </div>
+                        </div>
+                        ${summary ? `<div class="mt-3"><strong>Ringkasan:</strong> ${summary}</div>` : ''}
+                    </div>
+                `;
+                
+                // Add AI sections if available
+                if (Object.keys(aiGeneratedContent).length > 0) {
+                    previewHTML += `
+                        <div class="mb-4">
+                            <h4 class="border-bottom pb-2">Objektif Program</h4>
+                            <div>${aiGeneratedContent.objektif || '<p class="text-muted fst-italic">Tiada kandungan</p>'}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="border-bottom pb-2">Rumusan Program</h4>
+                            <div>${aiGeneratedContent.rumusan || '<p class="text-muted fst-italic">Tiada kandungan</p>'}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="border-bottom pb-2">Kekuatan Program</h4>
+                            <div>${aiGeneratedContent.kekuatan || '<p class="text-muted fst-italic">Tiada kandungan</p>'}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="border-bottom pb-2">Kelemahan Program</h4>
+                            <div>${aiGeneratedContent.kelemahan || '<p class="text-muted fst-italic">Tiada kandungan</p>'}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h4 class="border-bottom pb-2">Cadangan Penambahbaikan</h4>
+                            <div>${aiGeneratedContent.cadangan || '<p class="text-muted fst-italic">Tiada kandungan</p>'}</div>
+                        </div>
+                    `;
+                }
+                
+                // Add images if available
+                if (uploadedImages.length > 0) {
+                    previewHTML += `
+                        <div class="mt-5">
+                            <h4 class="border-bottom pb-2">Gambar Program</h4>
+                            <div class="report-image-grid">
+                    `;
+                    
+                    uploadedImages.forEach(image => {
+                        previewHTML += `<img src="${image.src}" class="report-image" alt="Gambar program">`;
+                    });
+                    
+                    previewHTML += `
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Update preview container
+                reportPreview.innerHTML = previewHTML;
+            }
+            
+            function exportToWord() {
+                alert('Fungsi eksport ke Word akan dilaksanakan. Dalam aplikasi sebenar, ini akan menjana dokumen .docx dengan kandungan laporan.');
+                // Implementation would use docx.js library
+            }
+            
+            function exportToPDF() {
+                const element = reportPreview;
+                const opt = {
+                    margin: 1,
+                    filename: `Laporan-${programTitle.value || 'program'}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                
+                html2pdf().set(opt).from(element).save();
+            }
+            
+            // Make functions available globally for onclick handlers
+            window.removeLogo = removeLogo;
+            window.removeImage = removeImage;
+            
+            // Initialize FilePond for better upload experience
+            FilePond.registerPlugin(FilePondPluginImagePreview);
+            FilePond.registerPlugin(FilePondPluginFileValidateType);
+            
+            const pondLogo = FilePond.create(logoUpload, {
+                acceptedFileTypes: ['image/png', 'image/jpeg'],
+                maxFileSize: '5MB',
+                labelIdle: 'Seret & Lepas logo atau <span class="filepond--label-action">Pilih</span>',
+                stylePanelLayout: 'compact circle',
+                styleLoadIndicatorPosition: 'center bottom',
+                styleProgressIndicatorPosition: 'right bottom',
+                styleButtonRemoveItemPosition: 'left bottom',
+                styleButtonProcessItemPosition: 'right bottom',
+                onaddfile: (error, file) => {
+                    if (error) return;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedLogo = e.target.result;
+                        updatePreview();
+                    };
+                    reader.readAsDataURL(file.file);
+                },
+                onremovefile: () => {
+                    uploadedLogo = null;
+                    updatePreview();
+                }
+            });
+            
+            const pondImages = FilePond.create(imageUpload, {
+                acceptedFileTypes: ['image/png', 'image/jpeg'],
+                maxFiles: 6,
+                maxFileSize: '5MB',
+                labelIdle: 'Seret & Lepas gambar atau <span class="filepond--label-action">Pilih</span>',
+                maxTotalFileSize: '30MB',
+                onaddfile: (error, file) => {
+                    if (error) return;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedImages.push({
+                            id: Date.now() + Math.random(),
+                            src: e.target.result,
+                            name: file.file.name
+                        });
+                        updateImagePreviews();
+                        updatePreview();
+                    };
+                    reader.readAsDataURL(file.file);
+                }
+            });
+            
+            // Initial preview update
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
